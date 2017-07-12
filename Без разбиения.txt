@@ -1,0 +1,80 @@
+import java.io.FileWriter;
+import java.io.IOException;
+
+
+
+public class Main {
+
+
+    static public int Imitation(int T, int count, int step, double lm, double goodP, double nu){
+        int lastT = 0;
+        int tFirst = 0;
+        boolean stop = false;
+        int countStart = count;
+
+        for(int i = 0; i < T; i = i + step ){
+            double rnd = Math.random();
+            double rnd2 = Math.random();
+            int dt = i - lastT;
+
+            //Fail
+            if(count > 0) {
+                if (rnd < (1 - Math.exp(-count * lm * dt))) {
+                    count--;
+                    lastT = i;
+                }
+            }
+           //add
+            /*
+            if(count < countStart){
+                if (rnd2 < (1 - Math.exp(-nu * dt))) {
+                    count++;
+                }
+            }
+            */
+        }
+
+        //System.out.println("Количество работоспособных машин: " + count);
+        return count;
+    }
+
+
+
+    public static void main(String[] args) {
+        int globalTime;
+        double lambda = 0.001;
+        double nu = 1;
+        int dt = 1;
+        int countElementaryMachine = 10000;
+        double delta = 0.7;
+        int countExperiment = 10;
+        int count = 0;
+        double dCount = 0;
+
+
+
+        for (int j = 0; j < 15000; j += 100) {
+            globalTime = j;
+            count = 0;
+
+            for (int i = 0; i < countExperiment; i++) {
+                int goodM = Imitation(globalTime, countElementaryMachine, dt, lambda, delta, nu);
+                int countGoodMachine = goodM;
+                //System.out.println("Количество работоспособных машин: " + countGoodMachine);
+                //System.out.println("---------------------------------------");
+                count += countGoodMachine;
+            }
+            double time = (double) j / 60 / 60;
+            dCount = count / countExperiment;
+            String textForWriting = time + " " +dCount;
+            try (FileWriter writer = new FileWriter("data5_2.txt", true)) {
+                //writer.write("gTime: " + globalTime + "; lambda: " + lambda + "; mCount: " + countElementaryMachine + "; exCount: " + countExperiment + "; Step: " + dt + "; Nu: " + nu + "\r\n");
+                writer.write(textForWriting + "\r\n");
+                //writer.write("-----------------------------------" + "\r\n");
+                writer.flush();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+}
